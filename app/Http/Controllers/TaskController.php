@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Task;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
@@ -13,7 +14,7 @@ class TaskController extends Controller
      */
     public function index()
     {
-        return "hello";
+        return view('task.index');
     }
 
     /**
@@ -34,7 +35,13 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $task = new Task();
+        $task->user_id = 1;
+        $task->title = $request->title;
+        $task->description = $request->description;
+        $task->save();
+
+        return redirect("/task");
     }
 
     /**
