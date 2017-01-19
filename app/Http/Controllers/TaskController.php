@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Task;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
@@ -14,17 +15,7 @@ class TaskController extends Controller
      */
     public function index()
     {
-        return view('task.index');
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        return view('task.index', ['tasks' => Task::all()]);
     }
 
     /**
@@ -35,57 +26,53 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
-        $task = new Task();
-        $task->user_id = 1;
-        $task->title = $request->title;
-        $task->description = $request->description;
-        $task->save();
+        \App\Task::create($request->all());
 
-        return redirect("/task");
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
+        return redirect('/task');
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param Task $task
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Task $task)
     {
-        //
+        return view('task.edit', ['task' => $task]);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \Illuminate\Http\Request $request
+     * @param Task $task
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Task $task)
     {
-        //
+        $task->update(request()->all());
+
+        return redirect('/task');
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param Task $task
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Task $task)
     {
-        //
+        $task->delete();
+
+        return redirect('/task');
+    }
+
+    public function done(Task $task) {
+        $task->done_at = Carbon::now();
+        $task->save();
+
+        return redirect('/task');
     }
 }
