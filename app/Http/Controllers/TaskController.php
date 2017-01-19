@@ -15,7 +15,7 @@ class TaskController extends Controller
      */
     public function index()
     {
-        return view('task.index', ['tasks' => Task::all()]);
+        return view('task.index', ['tasks' => Task::orderBy('created_at', 'desc')->paginate(10)]);
     }
 
     /**
@@ -26,7 +26,12 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
-        \App\Task::create($request->all());
+        $this->validate($request, [
+            'title' =>'required|max:255|string',
+            'description' => 'string'
+        ]);
+
+        Task::create($request->all());
 
         return redirect('/task');
     }

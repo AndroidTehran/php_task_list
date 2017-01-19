@@ -1,9 +1,6 @@
-<html>
-<head>
-    <title> Edit task </title>
-</head>
+@extends('layout.app')
 
-<body>
+@section('content')
 <form method="post" action="/task/{{ $task->id }}">
     {{ method_field('PUT') }}
     {{ csrf_field() }}
@@ -13,5 +10,4 @@
     <br>
     <button type="submit">Update</button>
 </form>
-</body>
-</html>
+@endsection

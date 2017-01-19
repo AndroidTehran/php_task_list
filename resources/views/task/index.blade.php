@@ -1,53 +1,75 @@
+@extends('layout.app')
 
-<html>
-<head>
-    <title> List of tasks </title>
-</head>
+@section('content')
+    <div class="col-sm-12 col-md-9 col-lg-6">
+        @include('common.error')
 
-<body>
-<form method="post">
-    {{ csrf_field() }}
-    <input type="text" placeholder="Title of your task ..." name="title">
-    <br>
-    <textarea name="description" placeholder="Description of your task ..."></textarea>
-    <br>
-    <button type="submit">Save</button>
-</form>
-<br>
-<table style="width: 100%" border="1">
+        <form method="post">
+            {{ csrf_field() }}
+            <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" class="form-control" placeholder="Title of your task ..." name="title" id="title">
+            </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea name="description" class="form-control" placeholder="Description of your task ..." id="description"></textarea>
+            </div>
+            <button type="submit" class="btn btn-default">Save</button>
+        </form>
+    </div>
+    <div class="clearfix"></div>
+
+<table class="table table-striped table-hover" style="margin-top: 5px;">
     <tr>
-        <td>Title</td>
-        <td>Description</td>
-        <td>Operations</td>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Operations</th>
     </tr>
     @foreach($tasks as $task)
-        <tr>
+        <tr @if($task->done_at != null) class="success" @endif>
             <td>
                 {{ $task->title }}
-                @if($task->done_at != null)
-                    (done)
-                @endif
             </td>
             <td>{{ $task->description }}</td>
             <td>
-                <form method="post"
-                      action="/task/{{ $task->id }}/done"
-                      style="display: inline-block; margin: 0;">
-                    {{ method_field('PUT') }}
-                    {{ csrf_field() }}
-                    <button type="submit">done</button>
-                </form>
-                <a href="/task/{{ $task->id }}/edit">edit</a>
+                @if(is_null($task->done_at))
+                    <form method="post"
+                          action="/task/{{ $task->id }}/done"
+                          style="display: inline-block; margin: 0;">
+                        {{ method_field('PUT') }}
+                        {{ csrf_field() }}
+                        <button type="submit"
+                                class="btn btn-success"
+                                data-toggle="tooltip"
+                                data-placement="bottom"
+                                title="Done">
+                            <span class="glyphicon glyphicon-ok"></span>
+                        </button>
+                    </form>
+                @endif
+                <a class="btn btn-warning"
+                   href="/task/{{ $task->id }}/edit"
+                   data-toggle="tooltip"
+                   data-placement="bottom"
+                   title="Edit">
+                    <span class="glyphicon glyphicon-pencil"></span>
+                </a>
                 <form method="post"
                       action="/task/{{ $task->id }}"
                       style="display: inline-block; margin: 0;">
                     {{ method_field('DELETE') }}
                     {{ csrf_field() }}
-                    <button type="submit">delete</button>
+                    <button type="submit"
+                            class="btn btn-danger"
+                            data-toggle="tooltip"
+                            data-placement="bottom"
+                            title="Delete">
+                        <span class="glyphicon glyphicon-remove"></span>
+                    </button>
                 </form>
             </td>
         </tr>
     @endforeach
 </table>
-</body>
-</html>
+    {{ $tasks->links() }}
+@endsection
