@@ -2,12 +2,27 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\TaskRequest;
+use App\Repositories\TaskRepository;
 use App\Task;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
+
+    /**
+     * @var TaskRepository
+     */
+    private $tasks;
+
+    public function __construct(TaskRepository $tasks) //inject
+    {
+        $this->middleware('auth');
+
+        $this->tasks = $tasks;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -15,7 +30,9 @@ class TaskController extends Controller
      */
     public function index()
     {
-        return view('task.index', ['tasks' => Task::orderBy('created_at', 'desc')->paginate(10)]);
+        return view('task.index', [
+            'tasks' => $this->tasks->index(request()->user())
+        ]);
     }
 
     /**
@@ -24,14 +41,9 @@ class TaskController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(TaskRequest $request)
     {
-        $this->validate($request, [
-            'title' =>'required|max:255|string',
-            'description' => 'string'
-        ]);
-
-        Task::create($request->all());
+        $this->tasks->store($request, $request->user());
 
         return redirect('/task');
     }
@@ -44,19 +56,23 @@ class TaskController extends Controller
      */
     public function edit(Task $task)
     {
+        $this->authorize('update', $task);
+
         return view('task.edit', ['task' => $task]);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param TaskRequest|Request $request
      * @param Task $task
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Task $task)
+    public function update(TaskRequest $request, Task $task)
     {
-        $task->update(request()->all());
+        $this->authorize('update', $task);
+
+        $this->tasks->update($request, $task);
 
         return redirect('/task');
     }
@@ -69,7 +85,9 @@ class TaskController extends Controller
      */
     public function destroy(Task $task)
     {
-        $task->delete();
+        $this->authorize('delete', $task);
+
+        $this->tasks->destroy($task);
 
         return redirect('/task');
     }
