@@ -22,16 +22,16 @@ class TaskRepository
 
     public function store(TaskRequest $request, User $user)
     {
-        $user->tasks()->save(new Task($request->all()));
+        return $user->tasks()->save(new Task($request->all()));
     }
 
     public function update(TaskRequest $request, Task $task)
     {
-        $task->update($request->all());
+        return $task->update($request->all());
     }
 
     public function destroy(Task $task)
     {
-        $task->delete();
+        return $task->delete();
     }
 }
