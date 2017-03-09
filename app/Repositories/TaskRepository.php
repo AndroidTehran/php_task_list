@@ -27,7 +27,9 @@ class TaskRepository
 
     public function update(TaskRequest $request, Task $task)
     {
-        return $task->update($request->all());
+        $task->update($request->all());
+
+        return $task;
     }
 
     public function destroy(Task $task)
